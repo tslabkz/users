@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <base href="../" target="_blank">
+    <base href="../../">
 
     <title>INSPINIA - Landing Page</title>
 
@@ -121,18 +121,17 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
-        $("#submit-form-btn").click(function(e){
+        $("#submit-form-btn").click(function(e) {
             e.preventDefault();
             $("#submit-form-btn").attr("disabled", '1');
             $("#alert-process-is-on").show();
             $("#show-response-area").html("");
+
             var data = {};
-            data['action'] = 'user.login';
-            data['service_id'] = project.default_service_id;
             data['username'] = $("input[name=username]").val();
             data['password'] = $("input[name=password]").val();
-            
-            let url = project.api_url + '?' + $.param(data);
+            let url = project.buildUrl('user.login', data);
+
             $.get(url, function(response) {
                 if (response.success) {
                     // success
