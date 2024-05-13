@@ -27,13 +27,13 @@
 
             <div class="row border-bottom white-bg page-heading">
                 <div class="col-sm-10">
-                    <h2>Форма подтверждения почты кодом</h2>
+                    <h2>Форма подтверждения телефона смс-кодом</h2>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="./index.html">Главная</a>
                         </li>
                         <li class="breadcrumb-item active">
-                            <strong>Подтверждение почты</strong>
+                            <strong>Подтверждение номера телефона</strong>
                         </li>
                     </ol>
                 </div>
@@ -51,7 +51,7 @@
         <div class="row">
             <div class="col-lg-12 text-center">
                 <div class="navy-line"></div>
-                <h1>Подтверждение почты</h1>
+                <h1>Подтверждение номера телефона</h1>
             </div>
         </div>
 
@@ -60,7 +60,7 @@
                 
                 <div class="ibox ">
                     <div class="ibox-title">
-                        <h5>Форма подтверждения почты <small>Показывает как ведет себя форма.</small></h5>
+                        <h5>Форма подтверждения номера телофна <small>Показывает как ведет себя форма.</small></h5>
                     </div>
 
                     <div class="ibox-content">
@@ -68,8 +68,8 @@
                             <div class="col-sm-12 b-r"><h3 class="m-t-none m-b">Подтверждение</h3>
                                 <form role="form" id="main-form">
                                     <div class="form-group">
-                                        <label>Email</label> 
-                                        <input type="text" placeholder="Enter email" class="form-control" name="email">  
+                                        <label>Phone</label> 
+                                        <input type="text" placeholder="Enter phone" class="form-control" name="phone">  
                                     </div> 
                                     
                                     <div class="form-group">
@@ -128,9 +128,9 @@
             $("#show-response-area").html("");
             
             var data = {};
-            data['email'] = $("input[name=email]").val();
+            data['phone'] = $("input[name=phone]").val();
             data['code'] = $("input[name=code]").val();
-            let url = project.buildUrl('user.emailCodeConfirm', data);
+            let url = project.buildUrl('user.phoneCodeConfirm', data);
 
             $.get(url, function(response) {
                 if (response.success) {
