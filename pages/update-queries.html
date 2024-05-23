@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <base href="../" >
+
+    <title>INSPINIA - Landing Page</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- https://tslabkz.github.io/inspinia -->
+
+    <!-- Animation CSS -->
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body id="page-top" class="landing-page no-skin-config" style="background-color: #f3f3f4;">
+
+            <div class="row border-bottom white-bg page-heading">
+                <div class="col-sm-10">
+                    <h2>Подтверждение измененных данных</h2>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="./index.html">Главная</a>
+                        </li>
+                        <li class="breadcrumb-item active">
+                            <strong>Страница подтверждения</strong>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-sm-2">
+                    <div class="title-action">
+                        <a href="./index.html" class="btn btn-primary">Главная</a>
+                    </div>
+                </div>
+            </div>
+
+<div class="gray-bg">
+
+    <section  class="container features">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="navy-line"></div>
+                <h1>Список запросов</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" >
+                
+                <div class="ibox ">
+                    <div class="ibox-title">
+                        <h5>Список запросов <small>Показывает как ведет себя форма.</small></h5>
+                    </div>
+
+
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="container"> 
+
+                    <div id="spinner-loader-el"  style="display: none;" >
+                        <div class="sk-spinner sk-spinner-double-bounce sk-loading">
+                            <div class="sk-double-bounce1"></div>
+                            <div class="sk-double-bounce2"></div>
+                        </div>
+                    </div>
+
+    <!-- start -->
+    
+    <div id="update-query-list-box"></div> 
+    <div class="alert alert-info" id="update-query-list-not-found" style="display: none;">Список запросов не найден</div>
+    <!-- end -->
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Mainly scripts -->
+<script src="js/jquery-3.1.1.min.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+<!-- Custom and plugin javascript -->
+<script src="js/inspinia.js"></script>
+<script src="js/plugins/pace/pace.min.js"></script>
+<script src="js/plugins/wow/wow.min.js"></script>
+<script src="js/project.js"></script>
+
+
+<script type="text/javascript">
+
+    if (isExpired()) {
+        loadFromRemote();
+    } else {
+        loadFromLocal()
+    }
+    
+    function isExpired() {
+        let listData = window.localStorage.getItem('updateQueryList');
+        if (!listData) {
+            return true;
+        }
+        let loadedTimeExpire = window.localStorage.getItem('updateQueryListLoadedTimeExpire');
+        if (!loadedTimeExpire) {
+            return true;
+        }
+        let currentTime = (new Date()).getTime();
+        let res = currentTime > loadedTimeExpire; 
+        return res;
+    }
+    
+    function loadFromLocal() {
+        let listData = window.localStorage.getItem('updateQueryList');
+        if (!listData) {
+            showErrorAlert('Local data not found');
+            return true;
+        };
+        buildActionTables(JSON.parse(listData));
+    }
+    
+    function loadFromRemote() { 
+        
+        let url = project.buildUrl('user.updateQueryActiveList', {});
+
+        $("#spinner-loader-el").show();
+        hideErrorAlert('');
+        $.get(url, function(response){
+            if (response.success) {
+                buildActionTables(response.data);
+                window.localStorage.setItem('updateQueryList', JSON.stringify(response.data));
+                let timeObject = new Date();
+                // здесь можно установить сколько времени хранить локальные данные
+                let seconds = 120; // 300 - 5 минут
+                const milliseconds = seconds * 1000; // 10 seconds = 10000 milliseconds
+                timeObject = new Date(timeObject.getTime() + milliseconds);
+                let expireTime = timeObject.getTime();
+                window.localStorage.setItem('updateQueryListLoadedTimeExpire', expireTime);
+                //
+            } else {
+                showErrorAlert('');
+            }
+        })
+        .fail(function(response) {
+            showErrorAlert('');
+        })
+        .always(function() {
+            $("#spinner-loader-el").hide();
+        });
+    
+    } // function loadFromRemote
+    
+    
+        function  showErrorAlert(message) {
+            $("#alert-process-failed").find('span').text(message);
+            $("#alert-process-failed").show();
+        }
+    
+        function  hideErrorAlert() {
+            $("#alert-process-failed").hide();
+            $("#alert-process-failed").find('span').text('');
+        }
+    
+        function buildActionTables(data) {
+            let boxContent = getBoxTemplate();
+            let content = '';
+            console.log(data);
+            data.forEach(function(item){
+                console.log(item);
+                    let rowContent = getRowTemplate();
+                    rowContent = rowContent.replace('%iin%', item.iin);
+                    let d = new Date(item.created_at);
+                    rowContent = rowContent.replace('%date%', 
+                    d.getDate() + '-' + d.getMonth() + '-' + d.getYear()
+                    + ' ' + d.getHours() + ':' + d.getMinutes());
+                    rowContent = rowContent.replace('%iin%', item.iin);
+                    content = content + rowContent;
+            });
+            boxContent = boxContent.replace('%content%', content);
+            $("#update-query-list-box").append(boxContent);
+        }
+    
+        function getBoxTemplate() {
+            return '<table class="table">' +
+                            '<thead>' +
+                            '<tr>' +
+                                '<th>ИИН</th>' +
+                                '<th>Дата</th>' +
+                                '<th>&nbsp;</th>' +
+                            '</tr>' +
+                            '</thead>' +
+                            '<tbody>' +
+                                '%content%'+
+                            '</tbody>'+
+                    '</table>'+
+                '</div>'+
+            '</div>';
+        }
+    
+        function getRowTemplate() {
+            return '<tr>'+
+                '<td>%iin%</td>'+
+                '<td>%date%</td>'+
+                '<td><a href="#" data-iin="%iin%" class="show-modal-to-confirm" >Ответить</a></td>'+
+            '</tr>';
+        }
+    
+    </script>
+
+
+</body>
+</html>
