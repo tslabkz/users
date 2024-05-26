@@ -13,6 +13,7 @@
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/plugins/ladda/ladda-themeless.min.css" rel="stylesheet">
 
     <!-- https://tslabkz.github.io/inspinia -->
 
@@ -87,6 +88,99 @@
                         </div>
                     </div>
                 </div>
+<!-- modal:start --> 
+<div class="modal inmodal fade" id="confirmPersonalFormModal" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Форма подтверждения данных</h4>
+                <small class="font-bold">Здесь вы можете подтвердить и подправить измененные персональные данные.</small>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Имя</label> 
+                    <label class="col-sm-4 col-form-label profile-label-name"></label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="confirm-form-name">
+                        <input type="hidden" class="form-control" name="user-confirm-form-name">
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Фамилия</label>
+                    <label class="col-sm-4 col-form-label profile-label-surname"></label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="confirm-form-surname">
+                        <input type="hidden" class="form-control" name="user-confirm-form-surname">
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Отчество</label>
+                    <label class="col-sm-4 col-form-label profile-label-lastname"></label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="confirm-form-lastname">
+                        <input type="hidden" class="form-control" name="user-confirm-form-lastname">
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">День рождения</label>
+                    <label class="col-sm-4 col-form-label profile-label-birthdate"></label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="confirm-form-birthdate">
+                        <input type="hidden" class="form-control" name="user-confirm-form-birthdate">
+                    </div>
+                </div> 
+                
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Резидент</label>
+                    <label class="col-sm-4 col-form-label profile-label-resident"></label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="confirm-form-resident">
+                        <input type="hidden" class="form-control" name="user-confirm-form-resident">
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Национальность</label>
+                    <label class="col-sm-4 col-form-label profile-label-nationality"></label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="confirm-form-nationality">
+                        <input type="hidden" class="form-control" name="user-confirm-form-nationality">
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Пол</label>
+                    <label class="col-sm-4 col-form-label profile-label-gender"></label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="confirm-form-gender">
+                        <input type="hidden" class="form-control" name="user-confirm-form-gender">
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" class="form-control" name="confirm-form-iin" >
+                <button type="button" class="btn btn-white" data-dismiss="modal">Закрыть</button>
+                
+                <button class="ladda-button btn btn-danger" data-style="slide-left" id="confirm-data-form-cancel">
+                    <span class="ladda-label">Отменить изменения</span><span class="ladda-spinner"></span>
+                    <div class="ladda-progress" style="width: 0px;"></div>
+                </button>
+
+                <button class="ladda-button btn btn-info" data-style="slide-left" id="confirm-data-form-submit">
+                    <span class="ladda-label">Сохранить</span><span class="ladda-spinner"></span>
+                    <div class="ladda-progress" style="width: 0px;"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal:end --> 
             </div>
         </div>
     </section>
@@ -103,10 +197,99 @@
 <script src="js/inspinia.js"></script>
 <script src="js/plugins/pace/pace.min.js"></script>
 <script src="js/plugins/wow/wow.min.js"></script>
+
+<!-- Ladda -->
+<script src="js/plugins/ladda/spin.min.js"></script>
+<script src="js/plugins/ladda/ladda.min.js"></script>
+<script src="js/plugins/ladda/ladda.jquery.min.js"></script>
+
 <script src="js/project.js"></script>
 
 
 <script type="text/javascript">
+
+    $(document).ready(function() {
+        let confirmProps = ['name', 'surname', 'lastname', 
+            'birthdate', 'resident', 'nationality', 'gender'];
+        // показываем модальную форму
+        $("body").on('click', '.show-modal-to-confirm', function(e) {
+            e.preventDefault();
+            let confirmData = JSON.parse($(this).next('span.confirm-data').text());
+            let profileData = JSON.parse($(this).next().next('span.profile-data').text());
+            let confirmItems = JSON.parse(confirmData.data);
+            $("input[name=confirm-form-iin]").val(profileData.uuid);
+            confirmProps.forEach(function(prop) {
+                $(".profile-label-" + prop).text(profileData[prop]);
+                let propValue = '';
+                if (confirmItems[prop]) {
+                    propValue = confirmItems[prop];
+                }
+                $("input[name=confirm-form-"+prop+"]").val(propValue);
+                $("input[name=user-confirm-form-"+prop+"]").val(propValue);
+            });
+        });
+        // отмена подтвержденных данных
+        $("#confirm-data-form-cancel").click(function(e) {
+            e.preventDefault();
+            $("#confirm-data-form-submit").attr('disabled', true);
+            var l = Ladda.create(this);
+            l.start();
+            let data = {};
+            data['uuid'] = $("input[name=confirm-form-iin]").val();
+            data['cancel'] = 1;
+            let url = project.buildUrl('user.updateQueryConfirm', data);
+            $.get(url, function(response) { 
+                if (response.success) { 
+                    console.log("changes canceled");
+                } 
+            })
+            .fail(function(response) {
+            })
+            .always(function() {
+                l.stop(); 
+                $("#confirm-data-form-submit").removeAttr('disabled');
+            }); 
+        });
+        // отправка подтвержденных данных
+        // 
+        $("#confirm-data-form-submit").click(function(e){
+            e.preventDefault();
+            $("#confirm-data-form-cancel").attr('disabled', true);
+            var l = Ladda.create(this); 
+            l.start(); 
+            let data = {}; 
+            data['uuid'] = $("input[name=confirm-form-iin]").val(); 
+            data['corrected_data'] = ''; 
+            let correctedData = {};
+            // 
+            confirmProps.forEach(function(prop) { 
+                // confirmValue - то что изменил пользователь 
+                // adminValue - то что поменял админ 
+                let confirmValue = $("input[name=user-confirm-form-"+prop+"]").val(); 
+                let adminValue = $("input[name=confirm-form-"+prop+"]").val(); 
+                if (confirmValue != adminValue) {
+                    correctedData[prop] = adminValue; 
+                }
+            });
+            data['corrected_data'] = JSON.stringify(correctedData); 
+            // setTimeout(function(){
+            //     l.stop();
+            //     $("#confirm-data-form-cancel").removeAttr('disabled');
+            // }, 3000); 
+            let url = project.buildUrl('user.updateQueryConfirm', data); 
+            $.get(url, function(response) { 
+                if (response.success) {  
+                    // window.location.reload(); 
+                } 
+            })
+            .fail(function(response) {
+            })
+            .always(function() {
+                l.stop(); 
+                $("#confirm-data-form-cancel").removeAttr('disabled');
+            }); 
+        });
+    });
 
     if (isExpired()) {
         loadFromRemote();
@@ -138,9 +321,7 @@
     }
     
     function loadFromRemote() { 
-        
         let url = project.buildUrl('user.updateQueryActiveList', {});
-
         $("#spinner-loader-el").show();
         hideErrorAlert('');
         $.get(url, function(response){
@@ -149,7 +330,7 @@
                 window.localStorage.setItem('updateQueryList', JSON.stringify(response.data));
                 let timeObject = new Date();
                 // здесь можно установить сколько времени хранить локальные данные
-                let seconds = 120; // 300 - 5 минут
+                let seconds = 10; // 300 - 5 минут
                 const milliseconds = seconds * 1000; // 10 seconds = 10000 milliseconds
                 timeObject = new Date(timeObject.getTime() + milliseconds);
                 let expireTime = timeObject.getTime();
@@ -182,17 +363,19 @@
         function buildActionTables(data) {
             let boxContent = getBoxTemplate();
             let content = '';
-            console.log(data);
-            data.forEach(function(item){
-                console.log(item);
-                    let rowContent = getRowTemplate();
-                    rowContent = rowContent.replace('%iin%', item.iin);
-                    let d = new Date(item.created_at);
-                    rowContent = rowContent.replace('%date%', 
-                    d.getDate() + '-' + d.getMonth() + '-' + d.getYear()
-                    + ' ' + d.getHours() + ':' + d.getMinutes());
-                    rowContent = rowContent.replace('%iin%', item.iin);
-                    content = content + rowContent;
+            data.forEach(function(item) {
+                let confirm = item.confirm;
+                let profile = item.profile;
+                let rowContent = getRowTemplate();
+                rowContent = rowContent.replace('%iin%', confirm.iin);
+                let d = new Date(confirm.created_at);
+                rowContent = rowContent.replace('%date%', 
+                d.getDate() + '-' + d.getMonth() + '-' + d.getYear()
+                + ' ' + d.getHours() + ':' + d.getMinutes());
+                rowContent = rowContent.replace('%iin%', confirm.iin);
+                rowContent = rowContent.replace('%confirm%', JSON.stringify(confirm));
+                rowContent = rowContent.replace('%profile%', JSON.stringify(profile));
+                content = content + rowContent;
             });
             boxContent = boxContent.replace('%content%', content);
             $("#update-query-list-box").append(boxContent);
@@ -219,7 +402,11 @@
             return '<tr>'+
                 '<td>%iin%</td>'+
                 '<td>%date%</td>'+
-                '<td><a href="#" data-iin="%iin%" class="show-modal-to-confirm" >Ответить</a></td>'+
+                '<td>'+
+                    '<a href="#" class="show-modal-to-confirm" data-toggle="modal" data-target="#confirmPersonalFormModal" >Ответить</a>'+
+                    '<span class="confirm-data" style="display:none;" >%confirm%</span>' +
+                    '<span class="profile-data" style="display:none;" >%profile%</span>' +
+                '</td>'+
             '</tr>';
         }
     
